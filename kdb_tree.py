@@ -1,8 +1,14 @@
 import numpy as np
-from numpy.lib.function_base import insert
-
-from utils import overlapping_range, split_region_node, region_range, split_point_node
 import copy
+
+from numpy.lib.arraysetops import isin
+from utils import (
+    overlapping_range,
+    split_region_node,
+    region_range,
+    split_point_node,
+    overlapping_point,
+)
 
 
 class Node(object):
@@ -46,7 +52,7 @@ class KDBTree(object):
                 if len(node.parent.regions) >= self.num_region - 1:
                     node_parent = node.parent["node"]
                     while len(node_parent.regions) >= self.num_region - 1:
-                        right = split_region_node(node_parent, pivot, axis)
+                        right = split_region_node(node_parent, pivot, axis, self.dim)
                         if node_parent == self.root:
                             node_parent.range_bound = region_range(
                                 self.dim, node_parent.regions
@@ -75,4 +81,23 @@ class KDBTree(object):
                     right.range_bound = rrange
                     node_parent.regions[parent_index] = right
                     node_parent.regions.append(right)
-                    insert(node_parent, depth + 1)
+                    __insert__(node_parent, depth + 1)
+
+    def query(self, query):
+        if not isinstance(query[0], list):
+            query = [[x, x] for x in query]
+            result = []
+
+        def __query__(node: Node):
+            nonlocal result
+            if node.node_type == "region":
+                for re in node.regions:
+                    if overlapping_range(query, re.range_bound):
+                        __query__(re)
+            elif node.node_type == "points":
+                for pt in node.points:
+                    if overlapping_point(query, pt):
+                        result.append(pt)
+
+        __query__(self.root)
+        return result
