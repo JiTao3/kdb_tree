@@ -88,7 +88,7 @@ class KDBTree(object):
     def query(self, query):
         if not isinstance(query[0], list):
             query = [[x, x] for x in query]
-            result = []
+        result = []
 
         def __query__(node: Node):
             nonlocal result
@@ -98,7 +98,7 @@ class KDBTree(object):
                         __query__(re)
             elif node.node_type == "points":
                 for pt in node.points:
-                    if overlapping_point(query, pt):
+                    if overlapping_point(query, pt["point"]):
                         result.append(pt)
 
         __query__(self.root)
@@ -191,7 +191,7 @@ def overlapping_point(query, point):
         )
 
     for q, pt in zip(query, point):
-        if not overlaping_mm(q[0], q[1], pt[0], pt[1]):
+        if not overlaping_mm(q[0], q[1], pt, pt):
             return False
     return True
 
@@ -208,14 +208,16 @@ def _test_query_():
     # kdb_tree.insert([1, 1, 1], 'h')
     # kdb_tree.insert([2, 1, 0], 'i')
     num = 0
-    for i in range(3):
-        for j in range(3):
-            for k in range(3):
-                print("insert:{},{}".format([i, j, k], num))
+    for i in range(10):
+        for j in range(10):
+            for k in range(10):
+                # print("insert:{},{}".format([i, j, k], num))
                 kdb_tree.insert([i, j, k], str(num))
                 num += 1
     return kdb_tree
 
 
 if __name__ == "__main__":
-    _test_query_()
+    kdb_tree = _test_query_()
+    result = kdb_tree.query([1, 1, 1])
+    print(result)
