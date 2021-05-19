@@ -14,3 +14,8 @@ result = kdb_tree.query([1, 1, 1])
 # range query
 result = kdb_tree.query([[il, ih], [jl, jh], [kl, kh]])
 ```
+### Parameter
+
+- `dim=3` points dimension (require)
+- `point_thread=4` number of points per page (default 4)
+- `num_region=3` number of regions per page (default: 3)

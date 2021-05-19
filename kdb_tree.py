@@ -2,8 +2,6 @@ import numpy as np
 import copy
 from copy import deepcopy
 
-from numpy.lib.polynomial import roots
-
 
 class Node(object):
     def __init__(self, node_type="region") -> None:
